@@ -1,0 +1,79 @@
+version: "2"
+
+services:
+  web:
+    restart: always
+    build: ./backend
+    image: grafana-wallet-webworkerimage
+    working_dir: /usr/src/app
+    expose:
+      - "8000"
+    links:
+      - postgres:postgres
+      - redis:redis
+    volumes:
+      - ./backend:/usr/src/app
+      - /usr/src/app/static
+      - mediadata:/usr/src/app/media
+    env_file: .env
+    environment:
+      DEBUG: 'true'
+      VIRTUAL_HOST: 'backend'
+    command: /usr/local/bin/gunicorn backend.wsgi:application -w 1 -t 120 -b 0.0.0.0:8000 --reload --log-level debug
+    stdin_open: true
+    tty: true
+    networks:
+      - api-tier
+      - back-tier
+
+  nginx:
+    restart: always
+    build: ./nginx
+    container_name: grafana-wallet-nginx
+    environment:
+      DEFAULT_HOST: 'localhost'
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/sites-enabled:/etc/nginx
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    volumes_from:
+      - web
+    depends_on:
+      - web
+    links:
+      - web
+    networks:
+      - api-tier
+
+  postgres:
+    restart: always
+    image: postgres:10.7
+    container_name: indiva-postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data/
+    networks:
+      - back-tier
+
+  redis:
+    restart: always
+    image: redis:6.2.0
+    container_name: grafana-wallet-redis
+    ports:
+      - "6382:6379"
+    volumes:
+      - redisdata:/data
+    networks:
+      - back-tier
+
+volumes:
+  pgdata:
+  mediadata:
+  redisdata:
+
+networks:
+  api-tier:
+    driver: bridge
+  back-tier:
+    driver: bridge
