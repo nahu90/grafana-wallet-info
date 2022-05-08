@@ -1,0 +1,53 @@
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
+
+# Python cache
+_
+_pycache__/
+*.pyc
+
+# Virtual environment
+env/
+venv/
+
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# Mac desktop service store files
+.DS_Store
+
+# Pycharm
+.idea/
+
+# Env variables
+.env
+.envPROD
+
+## Project
+
+# Local Settings
+backend/backend/local_settings.py
+
+# Testing Cache
+backend/.pytest_cache/
+
+# Testing Cache
+backend/.coverage
+
+# Static
+/backend/static/
+
+# Media files
+backend/media/
+
+####Docker####
+nginx/sites-enabled/nginx.conf
