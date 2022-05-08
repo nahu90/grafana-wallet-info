@@ -31,7 +31,8 @@ services:
     build: ./nginx
     container_name: grafana-wallet-nginx
     environment:
-      DEFAULT_HOST: 'localhost'
+      GRAFANA_DEFAULT_HOST: 'localhost'
+      API_DEFAULT_HOST: 'api.localhost'
     ports:
       - "80:80"
       - "443:443"
@@ -45,16 +46,40 @@ services:
     links:
       - web
     networks:
+      - front-tier
       - api-tier
 
   postgres:
     restart: always
-    image: postgres:10.7
-    container_name: indiva-postgres
+    image: postgres:12.10
+    container_name: grafana-wallet-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     volumes:
       - pgdata:/var/lib/postgresql/data/
     networks:
       - back-tier
+    ports:
+      - "5432:5432"
+
+  grafana:
+    restart: always
+    build: ./grafana
+    container_name: grafana-wallet-web
+    ports:
+      - "9000:3000"
+    volumes:
+      - grafanadata:/var/lib/grafana
+    environment:
+      VIRTUAL_HOST: 'frontend'
+    depends_on:
+      - postgres
+    stdin_open: true
+    tty: true
+    networks:
+      - back-tier
+      - front-tier
 
   redis:
     restart: always
@@ -67,12 +92,54 @@ services:
     networks:
       - back-tier
 
+  celeryworker:
+    restart: always
+    build: ./backend
+    image: grafana-wallet-webworkerimage
+    working_dir: /usr/src/app
+    container_name: grafana-wallet-celeryworker
+    volumes:
+      - mediadata:/usr/src/app/media
+      - ./backend:/usr/src/app
+    env_file: .env
+    environment:
+      DEBUG: 'true'
+      C_FORCE_ROOT: 'yes'
+    depends_on:
+      - postgres
+      - redis
+    command: celery worker -A=backend --maxtasksperchild 10 -E --loglevel=DEBUG
+    networks:
+      - back-tier
+
+  celerybeat:
+    restart: always
+    build: ./backend
+    image: grafana-wallet-webworkerimage
+    working_dir: /usr/src/app
+    container_name: grafana-wallet-celerybeat
+    volumes:
+      - ./backend:/usr/src/app
+    env_file: .env
+    environment:
+      DEBUG: 'true'
+      C_FORCE_ROOT: 'yes'
+    depends_on:
+      - postgres
+      - redis
+    command: celery beat --app=backend -s /tmp/celerybeat-schedule --pid=/tmp/celery.pid --loglevel=DEBUG
+    networks:
+      - back-tier
+
 volumes:
   pgdata:
   mediadata:
   redisdata:
+  grafanadata:
 
 networks:
+  front-tier:
+    driver: bridge
   api-tier:
     driver: bridge
   back-tier:

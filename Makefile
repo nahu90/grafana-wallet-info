@@ -1,5 +1,4 @@
 WEB=`docker-compose ps | grep gunicorn | cut -d\  -f 1 | head -n 1`
-NODE=`docker-compose ps | grep npm | cut -d\  -f 1 | head -n 1`
 WEBS=`docker-compose ps | grep gunicorn | cut -d\  -f 1 `
 FILE=docker-compose.yml
 BACKUPS_DIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST)))/../backups/)
@@ -43,10 +42,10 @@ shell-web:
 	docker exec -ti $(WEB) bash
 
 shell-db:
-	docker exec -ti grafana-wallet-postgis bash
+	docker exec -ti grafana-wallet-postgres bash
 
-shell-node:
-	docker exec -ti $(NODE) bash
+shell-grafana:
+	docker exec -ti grafana-wallet-web bash
 
 shell-celeryw:
 	docker exec -ti grafana-wallet-celeryworker bash
@@ -67,11 +66,11 @@ log-web:
 log-web-live:
 	docker logs --tail 50 --follow --timestamps $(WEB)
 
-log-node:
-	docker-compose logs node
+log-grafana:
+	docker-compose logs grafana-wallet-web
 
-log-node-live:
-	docker logs --tail 50 --follow --timestamps $(NODE)
+log-grafana-live:
+	docker logs --tail 50 --follow --timestamps grafana-wallet-web
 
 log-db:
 	docker-compose logs db

@@ -55,12 +55,9 @@ INSTALLED_APPS = [
     'core',
 
     # Third-party apps
-    'rest_framework',
-    'corsheaders',
     'import_export',
-    'django_filters',
     'solo',
-    'drf_yasg',
+    'celery',
 ]
 
 if DEBUG:
@@ -85,7 +82,6 @@ AUTH_USER_MODEL = 'core.User'
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -94,6 +90,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'backend.urls'
+AK = "eyJrIjoiNlpuRU91TjNhYWY4enVYZTNmNnc0NWV2c0o3M1gzblgiLCJuIjoiQWRtaW4iLCJpZCI6MX0="
 
 TEMPLATES = [
     {
@@ -135,40 +132,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Rest Framework
-REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    ),
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
-    ),
-    'DEFAULT_RENDERER_CLASSES': (
-        'rest_framework.renderers.JSONRenderer',
-    ),
-    'DEFAULT_PARSER_CLASSES': (
-        'rest_framework.parsers.FormParser',
-        'rest_framework.parsers.MultiPartParser',
-        'rest_framework.parsers.JSONParser',
-    ),
-    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend', ),
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10,
-}
-
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
-    'REFRESH_TOKEN_LIFETIME': timedelta(minutes=120),
-    'ROTATE_REFRESH_TOKENS': True,
-    'UPDATE_LAST_LOGIN': True,
-    'AUTH_HEADER_TYPES': ('Bearer', 'JWT'),
-    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
-    'USER_ID_FIELD': 'id',
-    'USER_ID_CLAIM': 'user_id',
-}
-
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
@@ -209,6 +172,16 @@ AUTHENTICATION_BACKENDS = (
 REDIS_HOST = os.getenv('REDIS_HOST', 'redis')
 REDIS_PORT = os.getenv('REDIS_PORT', '6379')
 REDIS_DB = os.getenv('REDIS_DB', '0')
+
+CELERY_BROKER_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}'
+CELERY_RESULT_BACKEND = f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_ENABLE_UTC = True
+
+from .celery_beat_schedule import beat_schedule
+CELERY_BEAT_SCHEDULE = beat_schedule
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 

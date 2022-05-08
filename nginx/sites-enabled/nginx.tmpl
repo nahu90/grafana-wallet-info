@@ -1,6 +1,6 @@
 {{ $CurrentContainer := where $ "ID" .Docker.CurrentContainerID | first }}
-{{ $api_default_host := or ($CurrentContainer.Env.API_DEFAULT_HOST) "" }}
-{{ $react_default_host := or ($CurrentContainer.Env.REACT_DEFAULT_HOST) "null" }}
+{{ $api_default_host := or ($CurrentContainer.Env.API_DEFAULT_HOST) "null" }}
+{{ $grafana_default_host := or ($CurrentContainer.Env.GRAFANA_DEFAULT_HOST) "null" }}
 {{ $is_production_deploy := or ($CurrentContainer.Env.IS_PRODUCTION_DEPLOY) "false" }}
 
 daemon off;
@@ -100,11 +100,11 @@ server {
     }
 }
 
-{{ if eq $react_default_host "null" }}
+{{ if eq $grafana_default_host "null" }}
 {{ else }}
 server {
     listen 80;
-    server_name {{ $react_default_host }};
+    server_name {{ $grafana_default_host }};
     charset utf-8;
 
     location / {
