@@ -17,3 +17,44 @@ class TimeStampedModel(models.Model):
 
 class User(AbstractUser):
     profile_image = models.ImageField(verbose_name=_('profile image'), blank=True, null=True)
+
+
+class Coin(TimeStampedModel):
+    name = models.CharField(max_length=255, blank=True, null=True)
+    coingecko_id = models.CharField(max_length=255, blank=True, null=True)
+
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name = _('Coin')
+        verbose_name_plural = _('Coins')
+
+    def __str__(self):
+        return f'{self.name} [{self.coingecko_id}]'
+
+
+class CoinPrice(TimeStampedModel):
+    coin = models.ForeignKey(Coin, on_delete=models.CASCADE)
+    price = models.FloatField()
+    date = models.DateField()
+
+    class Meta:
+        verbose_name = _('Coin price')
+        verbose_name_plural = _('Coin prices')
+
+    def __str__(self):
+        return f'{self.price} [{self.date}]'
+
+
+class Wallet(TimeStampedModel):
+    name = models.CharField(max_length=255, blank=True, null=True)
+    address = models.CharField(max_length=255, blank=True, null=True)
+
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name = _('Wallet')
+        verbose_name_plural = _('Wallets')
+
+    def __str__(self):
+        return f'{self.name} [{self.address}]'

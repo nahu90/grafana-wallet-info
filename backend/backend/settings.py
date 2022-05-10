@@ -90,7 +90,13 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'backend.urls'
-AK = "eyJrIjoiNlpuRU91TjNhYWY4enVYZTNmNnc0NWV2c0o3M1gzblgiLCJuIjoiQWRtaW4iLCJpZCI6MX0="
+
+GRAFANA_HOST = os.getenv('GRAFANA_HOST', '')
+GRAFANA_API_KEY = os.getenv('GRAFANA_API_KEY', '')
+
+INFURA_POLYGON_URL = os.getenv('INFURA_POLYGON_URL', '')
+INFURA_PROJECT_ID = os.getenv('INFURA_PROJECT_ID', '')
+INFURA_PROJECT_SECRET = os.getenv('INFURA_PROJECT_SECRET', '')
 
 TEMPLATES = [
     {
@@ -109,13 +115,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'backend.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/1.11/ref/settings/#databases
-
-# Password validation
-# https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -193,39 +192,7 @@ EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', 'web@gmail.com')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '--------')
 EMAIL_FROM_ADDRESS = os.getenv('EMAIL_FROM_ADDRESS', 'web@gmail.com')
 
-SWAGGER_SETTINGS = {
-   'USE_SESSION_AUTH': False,
-   'SECURITY_DEFINITIONS': {
-      'Bearer': {
-            'type': 'apiKey',
-            'name': 'Authorization',
-            'in': 'header'
-      }
-   }
-}
-
-# CORS
-CORS_ALLOWED_ORIGINS = [
-    "https://web.com.ar",
-]
-
-CSRF_TRUSTED_ORIGINS = [
-    'https://web.com.ar',
-]
-
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
-
-CORS_ALLOW_HEADERS = [
-    'accept',
-    'accept-encoding',
-    'authorization',
-    'content-type',
-    'dnt',
-    'origin',
-    'user-agent',
-    'x-csrftoken',
-    'x-requested-with'
-]
 
 # Development server
 if os.getenv('DEVSERVER', 'true') == 'true':
@@ -237,10 +204,8 @@ if os.getenv('DEVSERVER', 'true') == 'true':
         '0.0.0.0'
     ])
 
-    # SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'] = timedelta(days=5)
-
-    CORS_ALLOW_ALL_ORIGINS = True
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 RUN_ASYNC = os.getenv('RUN_ASYNC', 'True') == 'True'
+
 

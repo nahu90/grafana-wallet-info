@@ -16,3 +16,10 @@ celery==5.2.6
 
 # Grafana
 grafanalib==0.6.3
+
+# Coingecko
+python-dateutil==2.8.2
+pycoingecko==2.2.0
+
+# Web3
+web3==5.29.0

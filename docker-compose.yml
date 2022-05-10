@@ -25,6 +25,7 @@ services:
     networks:
       - api-tier
       - back-tier
+      - front-tier
 
   nginx:
     restart: always
