@@ -109,7 +109,7 @@ services:
     depends_on:
       - postgres
       - redis
-    command: celery worker -A=backend --maxtasksperchild 10 -E --loglevel=DEBUG
+    command: celery --app=backend worker --max-tasks-per-child=10 -E --loglevel=DEBUG
     networks:
       - back-tier
 
@@ -128,7 +128,7 @@ services:
     depends_on:
       - postgres
       - redis
-    command: celery beat --app=backend -s /tmp/celerybeat-schedule --pid=/tmp/celery.pid --loglevel=DEBUG
+    command: celery --app=backend beat --schedule=/tmp/celerybeat-schedule --pidfile=/tmp/celery.pid --loglevel=DEBUG
     networks:
       - back-tier
 

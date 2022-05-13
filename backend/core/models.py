@@ -23,6 +23,10 @@ class Coin(TimeStampedModel):
     name = models.CharField(max_length=255, blank=True, null=True)
     coingecko_id = models.CharField(max_length=255, blank=True, null=True)
 
+    ethereum_contract_address = models.CharField(max_length=255, blank=True, null=True)
+    polygon_contract_address = models.CharField(max_length=255, blank=True, null=True)
+    contract_abi = models.TextField(blank=True, null=True)
+
     is_active = models.BooleanField(default=True)
 
     class Meta:
@@ -58,3 +62,16 @@ class Wallet(TimeStampedModel):
 
     def __str__(self):
         return f'{self.name} [{self.address}]'
+
+
+class WalletCoinBalance(TimeStampedModel):
+    wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
+    coin = models.ForeignKey(Coin, on_delete=models.CASCADE)
+    balance = models.FloatField()
+
+    class Meta:
+        verbose_name = _('Wallet Coin Balance')
+        verbose_name_plural = _('Wallet Coin Balances')
+
+    def __str__(self):
+        return f'{self.wallet} - {self.coin} - {self.balance}'

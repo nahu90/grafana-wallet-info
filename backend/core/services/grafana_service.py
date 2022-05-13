@@ -1,5 +1,6 @@
 import json
 
+import collections
 import requests
 from django.conf import settings
 from grafanalib._gen import DashboardEncoder
@@ -33,10 +34,12 @@ class GrafanaService:
 
         return get_dashboard_json
 
-    def update_or_create_prices_dashboards(self):
+    @staticmethod
+    def generate_coins_prices_panels():
         panels = []
         coins = Coin.objects.filter(is_active=True)
-        for coin in coins:
+        x_positions = collections.deque([0, 8, 16])
+        for i, coin in enumerate(coins):
             panel = TimeSeries(
                 title=f'{coin.name} Prices',
                 dataSource='django-postgresql',
@@ -47,10 +50,14 @@ class GrafanaService:
                     ),
                 ],
                 unit=USD_FORMAT,
-                gridPos=GridPos(h=10, w=22, x=0, y=10),
+                gridPos=GridPos(h=8, w=8, x=x_positions[0], y=0),
             )
             panels.append(panel)
+            x_positions.rotate(1)
 
+        return panels
+
+    def update_or_create_prices_dashboards(self):
         dashboard = Dashboard(
             time=Time('now-1y', 'now'),
             uid=f'coin_prices',
@@ -61,7 +68,7 @@ class GrafanaService:
                 'prices'
             ],
             timezone="browser",
-            panels=panels,
+            panels=self.generate_coins_prices_panels(),
         )
 
         wallet_dashboard_json = self.get_dashboard_json(dashboard, overwrite=True)

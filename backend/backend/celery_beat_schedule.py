@@ -1,8 +1,12 @@
 from celery.schedules import crontab
 
 beat_schedule = {
-    'test-task': {
-       'task': 'core.tasks.test_task',
-       'schedule': crontab(hour='00', minute='00'),
+    'update-wallets': {
+       'task': 'core.tasks.update_wallets',
+       'schedule': crontab(hour='*/1', minute='10'),
     },
+    'save-last-five-years-prices': {
+        'task': 'core.tasks.save_last_five_years_prices',
+        'schedule': crontab(hour='*/1', minute='20'),
+    }
 }
