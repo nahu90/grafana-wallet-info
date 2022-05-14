@@ -15,7 +15,7 @@ from datetime import timedelta
 
 
 ALLOWED_HOSTS = [
-    os.getenv('DEFAULT_HOST', 'web.com.ar')
+    os.getenv('DEFAULT_HOST', 'web.com.ar'),
 ]
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
