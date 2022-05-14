@@ -1,0 +1,147 @@
+version: "2"
+
+services:
+  web:
+    restart: always
+    build: ./backend
+    image: grafana-wallet-webworkerimage
+    working_dir: /usr/src/app
+    expose:
+      - "8000"
+    links:
+      - postgres:postgres
+      - redis:redis
+    volumes:
+      - ./backend:/usr/src/app
+      - /usr/src/app/static
+      - mediadata:/usr/src/app/media
+    env_file: .env
+    environment:
+      DEBUG: 'true'
+      VIRTUAL_HOST: 'backend'
+    command: /usr/local/bin/gunicorn backend.wsgi:application -w 1 -t 120 -b 0.0.0.0:8000 --reload --log-level debug
+    stdin_open: true
+    tty: true
+    networks:
+      - api-tier
+      - back-tier
+      - front-tier
+
+  nginx:
+    restart: always
+    build: ./nginx
+    container_name: grafana-wallet-nginx
+    environment:
+      GRAFANA_DEFAULT_HOST: 'naha.ar'
+      API_DEFAULT_HOST: 'django.naha.ar'
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/sites-enabled:/etc/nginx
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    volumes_from:
+      - web
+    depends_on:
+      - web
+    links:
+      - web
+    networks:
+      - front-tier
+      - api-tier
+
+  postgres:
+    restart: always
+    image: postgres:12.10
+    container_name: grafana-wallet-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data/
+    networks:
+      - back-tier
+    ports:
+      - "5432:5432"
+
+  grafana:
+    restart: always
+    build: ./grafana
+    container_name: grafana-wallet-web
+    ports:
+      - "9000:3000"
+    volumes:
+      - grafanadata:/var/lib/grafana
+    environment:
+      VIRTUAL_HOST: 'frontend'
+    depends_on:
+      - postgres
+    stdin_open: true
+    tty: true
+    networks:
+      - back-tier
+      - front-tier
+
+  redis:
+    restart: always
+    image: redis:6.2.0
+    container_name: grafana-wallet-redis
+    ports:
+      - "6382:6379"
+    volumes:
+      - redisdata:/data
+    networks:
+      - back-tier
+
+  celeryworker:
+    restart: always
+    build: ./backend
+    image: grafana-wallet-webworkerimage
+    working_dir: /usr/src/app
+    container_name: grafana-wallet-celeryworker
+    volumes:
+      - mediadata:/usr/src/app/media
+      - ./backend:/usr/src/app
+    env_file: .env
+    environment:
+      DEBUG: 'true'
+      C_FORCE_ROOT: 'yes'
+    depends_on:
+      - postgres
+      - redis
+    command: celery --app=backend worker --max-tasks-per-child=10 -E --loglevel=DEBUG
+    networks:
+      - back-tier
+
+  celerybeat:
+    restart: always
+    build: ./backend
+    image: grafana-wallet-webworkerimage
+    working_dir: /usr/src/app
+    container_name: grafana-wallet-celerybeat
+    volumes:
+      - ./backend:/usr/src/app
+    env_file: .env
+    environment:
+      DEBUG: 'true'
+      C_FORCE_ROOT: 'yes'
+    depends_on:
+      - postgres
+      - redis
+    command: celery --app=backend beat --schedule=/tmp/celerybeat-schedule --pidfile=/tmp/celery.pid --loglevel=DEBUG
+    networks:
+      - back-tier
+
+volumes:
+  pgdata:
+  mediadata:
+  redisdata:
+  grafanadata:
+
+networks:
+  front-tier:
+    driver: bridge
+  api-tier:
+    driver: bridge
+  back-tier:
+    driver: bridge
