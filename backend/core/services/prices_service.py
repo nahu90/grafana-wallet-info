@@ -1,6 +1,6 @@
 from datetime import datetime
-from dateutil.relativedelta import relativedelta
 
+from dateutil.relativedelta import relativedelta
 from pycoingecko import CoinGeckoAPI
 
 from core.models import Coin, CoinPrice
@@ -11,6 +11,14 @@ class PricesService:
 
     def __init__(self):
         self.coingecko_api = CoinGeckoAPI()
+
+    def get_actual_price(self, coin_id):
+        price = self.coingecko_api.get_price(
+            coin_id,
+            vs_currencies='usd'
+        )
+
+        return price[coin_id]['usd']
 
     def get_price_history(self, coin_id, years):
         now = datetime.now()

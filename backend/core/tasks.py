@@ -4,15 +4,10 @@ from core.services.prices_service import prices_service
 
 
 @app.task(max_retries=0)
-def test_task():
-    print("HELLO WORD")
-
-
-@app.task(max_retries=0)
 def update_wallets():
     polygon_service.update_wallets()
 
 
 @app.task(max_retries=0)
-def update_wallets():
+def save_last_five_years_prices():
     prices_service.save_last_five_years_prices()

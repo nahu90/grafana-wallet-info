@@ -68,6 +68,8 @@ class WalletCoinBalance(TimeStampedModel):
     wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
     coin = models.ForeignKey(Coin, on_delete=models.CASCADE)
     balance = models.FloatField()
+    usd_balance = models.FloatField(blank=True, null=True)
+    date = models.DateTimeField()
 
     class Meta:
         verbose_name = _('Wallet Coin Balance')

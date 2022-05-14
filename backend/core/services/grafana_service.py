@@ -1,12 +1,12 @@
+import collections
 import json
 
-import collections
 import requests
 from django.conf import settings
 from grafanalib._gen import DashboardEncoder
-from grafanalib.core import Dashboard, TimeSeries, GridPos, SqlTarget, USD_FORMAT, Time
+from grafanalib.core import Dashboard, TimeSeries, GridPos, SqlTarget, USD_FORMAT, Time, Stat
 
-from core.models import Coin
+from core.models import Coin, Wallet
 
 
 class GrafanaService:
@@ -45,7 +45,7 @@ class GrafanaService:
                 dataSource='django-postgresql',
                 targets=[
                     SqlTarget(
-                        rawSql=f'SELECT date AS "time", price AS metric, price FROM core_coinprice WHERE coin_id = { coin.id } ORDER BY 1,2',
+                        rawSql=f'SELECT date AS "time", price FROM core_coinprice WHERE coin_id = { coin.id } ORDER BY 1',
                         refId="A",
                     ),
                 ],
@@ -71,46 +71,83 @@ class GrafanaService:
             panels=self.generate_coins_prices_panels(),
         )
 
-        wallet_dashboard_json = self.get_dashboard_json(dashboard, overwrite=True)
-        self.upload_to_grafana(wallet_dashboard_json)
+        prices_dashboard_json = self.get_dashboard_json(dashboard, overwrite=True)
+        self.upload_to_grafana(prices_dashboard_json)
 
         return dashboard
 
-    # @staticmethod
-    # def update_or_create_wallets_dashboards(wallet):
-    #     bitcoin_prices = coingecko_service.get_price_history('bitcoin')
-    #     dashboard = Dashboard(
-    #         uid=f'grafanalib-wallet-{wallet.id}',
-    #         title=f'Wallet: {wallet.name} - [{wallet.address}]',
-    #         description=f'Data of wallet {wallet.name} - [{wallet.address}]',
-    #         tags=[
-    #             'wallet'
-    #         ],
-    #         timezone="browser",
-    #         panels=[
-    #             TimeSeries(
-    #                 title="Prometheus http requests",
-    #                 dataSource='prometheus',
-    #                 targets=[
-    #                     Target(
-    #                         expr='rate(prometheus_http_requests_total[5m])',
-    #                         legendFormat="{{ handler }}",
-    #                         refId='A',
-    #                     ),
-    #                 ],
-    #                 unit=OPS_FORMAT,
-    #                 gridPos=GridPos(h=8, w=16, x=0, y=10),
-    #             ),
-    #         ],
-    #     )
-    #
-    #     return dashboard
-    #
-    # def generate_wallets_dashboards(self):
-    #     wallets = Wallet.objects.filter(is_active=True)
-    #     for wallet in wallets:
-    #         wallet_dashboard = self.get_wallet_dashboard(wallet)
-    #         wallet_dashboard_json = self.get_dashboard_json(wallet_dashboard, overwrite=True)
-    #         self.upload_to_grafana(wallet_dashboard_json)
+    @staticmethod
+    def get_wallet_last_balance_panels(wallet):
+        panels = []
+        coins = Coin.objects.filter(is_active=True)
+        x_positions = collections.deque([0, 3, 6, 9, 12, 15, 18, 21])
+        for i, coin in enumerate(coins, 1):
+            panel = Stat(
+                title=f'{coin.name} Balance',
+                dataSource='django-postgresql',
+                targets=[
+                    SqlTarget(
+                        rawSql=f'SELECT date as time, balance as {coin.name} FROM core_walletcoinbalance WHERE coin_id = {coin.id} AND wallet_id = {wallet.id} ORDER BY 1',
+                        refId=f'A-{i}',
+                    ),
+                    SqlTarget(
+                        rawSql=f'SELECT date as time, usd_balance as usd FROM core_walletcoinbalance WHERE coin_id = {coin.id} AND wallet_id = {wallet.id} ORDER BY 1',
+                        refId=f'A-usd-{i}',
+                    ),
+                ],
+                gridPos=GridPos(h=4, w=3, x=x_positions[0], y=0),
+            )
+            panels.append(panel)
+            x_positions.rotate(1)
+
+        return panels
+
+    @staticmethod
+    def get_wallet_balance_timeline_panel(wallet):
+        targets_for_timeseries = []
+        coins = Coin.objects.filter(is_active=True)
+        for i, coin in enumerate(coins, 1):
+            targets_for_timeseries.append(
+                SqlTarget(
+                    rawSql=f'SELECT date as time, usd_balance as {coin.name} FROM core_walletcoinbalance WHERE coin_id = {coin.id} AND wallet_id = {wallet.id} ORDER BY 1',
+                    refId=f'B-{i}',
+                )
+            )
+
+        panel = TimeSeries(
+            title=f'Balances timeseries',
+            dataSource='django-postgresql',
+            targets=targets_for_timeseries,
+            unit=USD_FORMAT,
+            gridPos=GridPos(h=14, w=24, x=0, y=8),
+        )
+
+        return panel
+
+    def update_or_create_wallets_dashboards(self, wallet):
+        panels = []
+        panels.extend(self.get_wallet_last_balance_panels(wallet))
+        panels.append(self.get_wallet_balance_timeline_panel(wallet))
+
+        dashboard = Dashboard(
+            time=Time('now-12h', 'now'),
+            uid=f'grafanalib-wallet-{wallet.id}',
+            title=f'Wallet: {wallet.name} - [{wallet.address}]',
+            description=f'Data of wallet {wallet.name} - [{wallet.address}]',
+            tags=[
+                'wallet'
+            ],
+            timezone="browser",
+            panels=panels
+        )
+
+        return dashboard
+
+    def generate_wallets_dashboards(self):
+        wallets = Wallet.objects.filter(is_active=True)
+        for wallet in wallets:
+            wallet_dashboard = self.update_or_create_wallets_dashboards(wallet)
+            wallet_dashboard_json = self.get_dashboard_json(wallet_dashboard, overwrite=True)
+            self.upload_to_grafana(wallet_dashboard_json)
 
 grafana_service = GrafanaService()
