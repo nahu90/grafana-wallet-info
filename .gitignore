@@ -30,7 +30,7 @@ $RECYCLE.BIN/
 
 # Env variables
 .env
-.envPROD
+.gfenv
 
 ## Project
 

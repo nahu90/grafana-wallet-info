@@ -62,7 +62,7 @@ services:
     networks:
       - back-tier
     ports:
-      - "5432:5432"
+      - "5432"
 
   grafana:
     restart: always
@@ -72,8 +72,7 @@ services:
       - "9000:3000"
     volumes:
       - grafanadata:/var/lib/grafana
-    environment:
-      VIRTUAL_HOST: 'frontend'
+    env_file: .gfenv
     depends_on:
       - postgres
     stdin_open: true
@@ -87,7 +86,7 @@ services:
     image: redis:6.2.0
     container_name: grafana-wallet-redis
     ports:
-      - "6382:6379"
+      - "6382"
     volumes:
       - redisdata:/data
     networks:
