@@ -81,35 +81,6 @@ log-celeryw:
 log-celeryb:
 	docker-compose logs celerybeat
 
-#######
-#Tests#
-#######
-
-pdb:
-	@echo "PDB (Exit: CONTROL + P + CONTROL + Q)"
-	docker attach $(WEB)
-
-pylint:
-	@echo "Running Pylint"
-	docker exec $(WEB) /bin/sh -c "pylint *"
-
-test:
-	@echo "Running python tests"
-	docker exec $(WEB) /bin/sh -c "pytest --cov"
-
-test-all:
-	@echo "Running all tests"
-	@echo "Running all tests in backend"
-	docker exec $(WEB) /bin/sh -c "pytest --cov"
-	docker exec $(WEB) /bin/sh -c "pylint *"
-	@echo "Running all tests in frontend"
-	docker exec $(NODE) /bin/sh -c "./node_modules/.bin/eslint ."
-
-eslint:
-	@echo "Running eslint"
-	docker exec $(NODE) /bin/sh -c "./node_modules/.bin/eslint ."
-
-
 ############
 #DJANGO OPS#
 ############
@@ -121,9 +92,6 @@ collectstatic:
 
 migrate:
 	docker exec $(WEB) /bin/sh -c "python manage.py migrate"
-
-cache_all_grid:
-	docker exec $(WEB) /bin/sh -c "python manage.py cache_all_grid"
 
 makemigrations:
 	docker exec $(WEB) /bin/sh -c "python manage.py makemigrations"
@@ -139,11 +107,6 @@ set-django: collectstatic migrate compilemessages
 #############
 #DEVELOPMENT#
 #############
-dev-restart:
-	docker-compose -f development.yml stop
-	docker-compose development.yml rm -f
-	docker-compose -f development.yml build
-	docker-compose -f development.yml up -d web nginx postgres node
 
 clean-nginx-conf:
 	rm -f nginx/sites-enabled/nginx.conf
@@ -151,9 +114,4 @@ clean-nginx-conf:
 deploy: clean-nginx-conf
 	make clean build up set-django FILE=$(FILE)
 
-deploy-worker:
-	make clean build up FILE=production-worker.yml
 
-restart-frontend:
-	docker stop grafana-wallet-node
-	docker start grafana-wallet-node
