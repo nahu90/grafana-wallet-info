@@ -4,7 +4,7 @@ import json
 import requests
 from django.conf import settings
 from grafanalib._gen import DashboardEncoder
-from grafanalib.core import Dashboard, TimeSeries, GridPos, SqlTarget, USD_FORMAT, Time, Stat
+from grafanalib.core import Dashboard, TimeSeries, GridPos, SqlTarget, USD_FORMAT, Time, Stat, Threshold
 
 from core.models import Coin, Wallet
 
@@ -85,6 +85,7 @@ class GrafanaService:
             panel = Stat(
                 title=f'{coin.name} Balance',
                 dataSource='django-postgresql',
+                colorMode='value',
                 targets=[
                     SqlTarget(
                         rawSql=f'SELECT date as time, balance as {coin.name} FROM core_walletcoinbalance WHERE coin_id = {coin.id} AND wallet_id = {wallet.id} ORDER BY 1',
@@ -93,6 +94,22 @@ class GrafanaService:
                     SqlTarget(
                         rawSql=f'SELECT date as time, usd_balance as usd FROM core_walletcoinbalance WHERE coin_id = {coin.id} AND wallet_id = {wallet.id} ORDER BY 1',
                         refId=f'A-usd-{i}',
+                    ),
+                ],
+                thresholds=[
+                    Threshold(
+                        color='gray',
+                        index=1,
+                        value=0.0,
+                        op='gt',
+                        yaxis='right'
+                    ),
+                    Threshold(
+                        color='green',
+                        index=1,
+                        value=0.000000001,
+                        op='gt',
+                        yaxis='right'
                     ),
                 ],
                 gridPos=GridPos(h=4, w=3, x=x_positions[0], y=0),

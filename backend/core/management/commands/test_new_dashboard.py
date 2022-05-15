@@ -14,4 +14,4 @@ class Command(BaseCommand):
         # prices_service.get_actual_price('wmatic')
         # grafana_service.update_or_create_prices_dashboards()
         # polygon_service.update_wallets()
-        # grafana_service.generate_wallets_dashboards()
+        grafana_service.generate_wallets_dashboards()

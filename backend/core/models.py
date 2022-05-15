@@ -77,3 +77,15 @@ class WalletCoinBalance(TimeStampedModel):
 
     def __str__(self):
         return f'{self.wallet} - {self.coin} - {self.balance}'
+
+
+class Image(TimeStampedModel):
+    name = models.CharField(max_length=255, blank=True, null=True)
+    img = models.ImageField(upload_to='images', blank=True, null=True)
+
+    class Meta:
+        verbose_name = _('Image')
+        verbose_name_plural = _('Images')
+
+    def __str__(self):
+        return f'{self.name}'
