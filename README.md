@@ -16,7 +16,7 @@
   </p>
 </div>
 
-[![grafana Screen Shot][product-screenshot-1]](http://django.naha.ar/media/images/Screenshot_from_2022-05-15_00-41-34.png)
+[![grafana Screen Shot][product-screenshot-1]](http://django.naha.ar/media/images/Screenshot_from_2022-05-19_18-43-40.png)
 [![grafana Screen Shot][product-screenshot-2]](http://django.naha.ar/media/images/Screenshot_from_2022-05-15_00-41-53.png)
 
 <!-- ABOUT THE PROJECT -->
@@ -153,6 +153,6 @@ Project Link: [https://github.com/nahu90/grafana-wallet-info](https://github.com
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[product-screenshot-1]: http://django.naha.ar/media/images/Screenshot_from_2022-05-15_00-41-34.png
+[product-screenshot-1]: http://django.naha.ar/media/images/Screenshot_from_2022-05-19_18-43-40.png
 [product-screenshot-2]: http://django.naha.ar/media/images/Screenshot_from_2022-05-15_00-41-53.png
 [product-screenshot-3]: http://django.naha.ar/media/images/Screenshot_from_2022-05-15_00-44-06.png
