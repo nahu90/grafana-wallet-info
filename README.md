@@ -56,7 +56,7 @@ in order to create graphics that are related to economic issues.
     - [ ] Avalanche
 - [x] Get balance of MATIC
 - [x] Get balance of ERC-20 tokens
-- [x] Get balance from AAVE supplies
+- [x] Get balance from AAVE v3 supplies
 - [ ] Get pools from Uniswap
 - [ ] Get pools from Quickswap
 
