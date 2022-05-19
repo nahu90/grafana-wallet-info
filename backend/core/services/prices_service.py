@@ -55,8 +55,11 @@ class PricesService:
         coins = Coin.objects.filter(is_active=True)
 
         for coin in coins:
-            price_history = self.get_price_history(coin.coingecko_id, years_to_save)
-            self.save_coin_price_history(coin, price_history)
+            try:
+                price_history = self.get_price_history(coin.coingecko_id, years_to_save)
+                self.save_coin_price_history(coin, price_history)
+            except Exception as e:
+                print(e)
 
     def save_last_five_years_prices(self):
         self.save_prices_in_database(5)
