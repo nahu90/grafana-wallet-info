@@ -45,6 +45,23 @@ in order to create graphics that are related to economic issues.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
+<!-- FEATURES -->
+## Features
+
+- [x] Get historical prices from Coingecko
+- [ ] Realtime last prices
+- [ ] Connect to Ethereum blockchain
+- [ ] Connect to L2 blockchains
+    - [x] Polygon
+    - [ ] Avalanche
+- [x] Get balance of MATIC
+- [x] Get balance of ERC-20 tokens
+- [x] Get balance from AAVE supplies
+- [ ] Get pools from Uniswap
+- [ ] Get pools from Quickswap
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
 ### Built With
 
 * [PostgreSQL](https://www.postgresql.org/)
@@ -116,20 +133,6 @@ As a prerequisite you will need to install docker, docker-compose and make.
 * It will be necesary for you to enter postgres and create a database for grafana, put the credentials in `.gfenv` and redeploy the app
 * You will have to enter grafana interface and add Django Postgres DB as a datasource.
 * It is important that you to enter grafana interface and create an api key, then put in `.env` in `GRAFANA_API_KEY` and redeploy the app
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-<!-- ROADMAP -->
-## Roadmap
-
-- [ ] Realtime last prices
-- [ ] Connect to L2 blockchains
-    - [x] Polygon
-    - [ ] Avalanche
-- [ ] Connect to Ethereum blockchain
-- [x] Get balance from AAVE
-- [ ] Get pools from Uniswap
-- [ ] Get pools from Quickswap
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
