@@ -123,11 +123,11 @@ As a prerequisite you will need to install docker, docker-compose and make.
 ## Roadmap
 
 - [ ] Realtime last prices
-- [ ] Connect to Ethereum blockchain
 - [ ] Connect to L2 blockchains
     - [x] Polygon
     - [ ] Avalanche
-- [ ] Get balance from AAVE
+- [ ] Connect to Ethereum blockchain
+- [x] Get balance from AAVE
 - [ ] Get pools from Uniswap
 - [ ] Get pools from Quickswap
 

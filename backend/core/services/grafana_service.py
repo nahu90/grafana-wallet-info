@@ -134,6 +134,9 @@ class GrafanaService:
         panel = TimeSeries(
             title=f'Balances timeseries',
             dataSource='django-postgresql',
+            lineWidth=2,
+            pointSize=8,
+            showPoints='always',
             targets=targets_for_timeseries,
             unit=USD_FORMAT,
             gridPos=GridPos(h=14, w=24, x=0, y=8),

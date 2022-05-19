@@ -27,7 +27,7 @@ class CoinAdmin(ImportExportModelAdmin):
     search_fields = ('name', 'coingecko_id', )
     list_filter = ('is_active', )
     list_display = (
-        'id', 'name', 'coingecko_id', 'is_active',
+        'id', 'name', 'coingecko_id', 'type', 'is_active',
     )
 
 

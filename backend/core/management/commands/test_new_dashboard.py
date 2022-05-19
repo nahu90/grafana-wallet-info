@@ -13,5 +13,9 @@ class Command(BaseCommand):
         # prices_service.save_last_five_years_prices()
         # prices_service.get_actual_price('wmatic')
         # grafana_service.update_or_create_prices_dashboards()
-        # polygon_service.update_wallets()
+        polygon_service.update_wallets()
         grafana_service.generate_wallets_dashboards()
+
+        # polygon_service.save_aave_balance()
+
+

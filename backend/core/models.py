@@ -3,6 +3,22 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
+
+class COIN_TYPE:
+    ETHEREUM = 'ETHEREUM'
+    POLYGON = 'POLYGON'
+    ERC_20 = 'ERC_20'
+    ATOKEN = 'ATOKEN'
+
+    items = [
+        (ETHEREUM, _('Ethereum')),
+        (POLYGON, _('Polygon')),
+        (ERC_20, _('ERC-20')),
+        (ATOKEN, _('AToken')),
+    ]
+    values = dict(items)
+
+
 class TimeStampedModel(models.Model):
     """
     An abstract base class model that provides self-updating
@@ -21,6 +37,7 @@ class User(AbstractUser):
 
 class Coin(TimeStampedModel):
     name = models.CharField(max_length=255, blank=True, null=True)
+    type = models.CharField(max_length=20, choices=COIN_TYPE.items)
     coingecko_id = models.CharField(max_length=255, blank=True, null=True)
 
     ethereum_contract_address = models.CharField(max_length=255, blank=True, null=True)
