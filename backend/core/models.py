@@ -96,6 +96,19 @@ class WalletCoinBalance(TimeStampedModel):
         return f'{self.wallet} - {self.coin} - {self.balance}'
 
 
+class WalletTotalBalance(TimeStampedModel):
+    wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
+    usd_balance = models.FloatField(blank=True, null=True)
+    date = models.DateTimeField()
+
+    class Meta:
+        verbose_name = _('Wallet Total Balance')
+        verbose_name_plural = _('Wallet Total Balances')
+
+    def __str__(self):
+        return f'{self.wallet} - {self.usd_balance}'
+
+
 class Image(TimeStampedModel):
     name = models.CharField(max_length=255, blank=True, null=True)
     img = models.ImageField(upload_to='images', blank=True, null=True)

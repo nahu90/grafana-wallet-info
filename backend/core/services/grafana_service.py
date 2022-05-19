@@ -6,7 +6,7 @@ from django.conf import settings
 from grafanalib._gen import DashboardEncoder
 from grafanalib.core import Dashboard, TimeSeries, GridPos, SqlTarget, USD_FORMAT, Time, Stat, Threshold
 
-from core.models import Coin, Wallet
+from core.models import Coin, Wallet, COIN_TYPE, WalletCoinBalance
 
 
 class GrafanaService:
@@ -79,13 +79,17 @@ class GrafanaService:
     @staticmethod
     def get_wallet_last_balance_panels(wallet):
         panels = []
-        coins = Coin.objects.filter(is_active=True)
+        coins = Coin.objects.filter(type__in=[COIN_TYPE.POLYGON, COIN_TYPE.ERC_20, COIN_TYPE.ATOKEN], is_active=True)
         x_positions = collections.deque([0, 3, 6, 9, 12, 15, 18, 21])
         for i, coin in enumerate(coins, 1):
+            if WalletCoinBalance.objects.filter(wallet=wallet, coin=coin).order_by('-date').first().balance <= 0:
+                continue
+
             panel = Stat(
                 title=f'{coin.name} Balance',
                 dataSource='django-postgresql',
                 colorMode='value',
+                reduceCalc='last',
                 targets=[
                     SqlTarget(
                         rawSql=f'SELECT date as time, balance as {coin.name} FROM core_walletcoinbalance WHERE coin_id = {coin.id} AND wallet_id = {wallet.id} ORDER BY 1',
@@ -122,7 +126,7 @@ class GrafanaService:
     @staticmethod
     def get_wallet_balance_timeline_panel(wallet):
         targets_for_timeseries = []
-        coins = Coin.objects.filter(is_active=True)
+        coins = Coin.objects.filter(type__in=[COIN_TYPE.POLYGON, COIN_TYPE.ERC_20, COIN_TYPE.ATOKEN], is_active=True)
         for i, coin in enumerate(coins, 1):
             targets_for_timeseries.append(
                 SqlTarget(
@@ -139,13 +143,47 @@ class GrafanaService:
             showPoints='always',
             targets=targets_for_timeseries,
             unit=USD_FORMAT,
-            gridPos=GridPos(h=14, w=24, x=0, y=8),
+            gridPos=GridPos(h=14, w=24, x=0, y=10),
+        )
+
+        return panel
+
+    def get_wallet_last_total_balance_panels(self, wallet):
+        panel = Stat(
+            title=f'Total Balance',
+            dataSource='django-postgresql',
+            colorMode='value',
+            reduceCalc='last',
+            targets=[
+                SqlTarget(
+                    rawSql=f'SELECT date as time, usd_balance as usd FROM core_wallettotalbalance WHERE wallet_id = {wallet.id} ORDER BY 1',
+                    refId=f'A-usd-Total',
+                ),
+            ],
+            thresholds=[
+                Threshold(
+                    color='gray',
+                    index=1,
+                    value=0.0,
+                    op='gt',
+                    yaxis='right'
+                ),
+                Threshold(
+                    color='green',
+                    index=1,
+                    value=0.000000001,
+                    op='gt',
+                    yaxis='right'
+                ),
+            ],
+            gridPos=GridPos(h=4, w=3, x=0, y=0),
         )
 
         return panel
 
     def update_or_create_wallets_dashboards(self, wallet):
         panels = []
+        panels.append(self.get_wallet_last_total_balance_panels(wallet))
         panels.extend(self.get_wallet_last_balance_panels(wallet))
         panels.append(self.get_wallet_balance_timeline_panel(wallet))
 
