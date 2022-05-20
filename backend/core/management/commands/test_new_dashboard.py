@@ -11,5 +11,5 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         pass
         # prices_service.save_coin_price_history_in_database()
-        polygon_service.update_wallets()
+        # polygon_service.update_wallets()make she
         grafana_service.generate_wallets_dashboards()

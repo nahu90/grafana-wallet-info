@@ -50,7 +50,7 @@ class WalletCoinBalanceAdmin(ImportExportModelAdmin):
 @admin.register(WalletTotalBalance)
 class WalletTotalBalanceAdmin(ImportExportModelAdmin):
     list_display = (
-        'id', 'wallet', 'usd_balance', 'date',
+        'id', 'wallet', 'usd_balance', 'date', 'is_active',
     )
 
 

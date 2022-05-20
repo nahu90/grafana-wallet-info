@@ -181,7 +181,7 @@ class GrafanaService:
     def get_wallet_last_total_balance_timeline_panels(wallet):
         targets_for_timeseries = [
             SqlTarget(
-                rawSql=f'SELECT date as time, usd_balance as usd FROM core_wallettotalbalance WHERE wallet_id = {wallet.id} ORDER BY 1',
+                rawSql=f'SELECT date as time, usd_balance as usd FROM core_wallettotalbalance WHERE wallet_id = {wallet.id} AND is_active = true ORDER BY 1',
                 refId=f'B-usd-total',
             ),
         ]
@@ -207,7 +207,7 @@ class GrafanaService:
             reduceCalc='last',
             targets=[
                 SqlTarget(
-                    rawSql=f'SELECT date as time, usd_balance as usd FROM core_wallettotalbalance WHERE wallet_id = {wallet.id} ORDER BY 1',
+                    rawSql=f'SELECT date as time, usd_balance as usd FROM core_wallettotalbalance WHERE wallet_id = {wallet.id} AND is_active = true ORDER BY 1',
                     refId=f'A-usd-Total',
                 ),
             ],
