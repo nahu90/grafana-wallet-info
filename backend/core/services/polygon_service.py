@@ -50,13 +50,16 @@ class PolygonService:
         )
         wallet_coin_balance.save()
 
-        usd_price = prices_service.get_actual_price('wmatic')
-        wallet_coin_balance.usd_balance = usd_price * float(wallet_coin_balance.balance)
-        wallet_coin_balance.save()
+        try:
+            usd_price = prices_service.get_actual_price('wmatic')
+            wallet_coin_balance.usd_balance = usd_price * float(wallet_coin_balance.balance)
+            wallet_coin_balance.save()
 
-        wallet_total_balance = WalletTotalBalance.objects.get(pk=wallet_total_balance_id)
-        wallet_total_balance.usd_balance = wallet_total_balance.usd_balance + wallet_coin_balance.usd_balance
-        wallet_total_balance.save()
+            wallet_total_balance = WalletTotalBalance.objects.get(pk=wallet_total_balance_id)
+            wallet_total_balance.usd_balance = wallet_total_balance.usd_balance + wallet_coin_balance.usd_balance
+            wallet_total_balance.save()
+        except Exception as e:
+            print(e)
 
     def save_aave_atoken_balance(self, wallet, atoken, wallet_total_balance_id):
         token = self.w3.eth.contract(
