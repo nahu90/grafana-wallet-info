@@ -5,8 +5,8 @@ beat_schedule = {
        'task': 'core.tasks.update_wallets',
        'schedule': crontab(hour='*/1', minute='10'),
     },
-    'save-last-five-years-prices': {
-        'task': 'core.tasks.save_last_five_years_prices',
+    'save-coin-price-history-in-database': {
+        'task': 'core.tasks.save_coin_price_history_in_database',
         'schedule': crontab(hour='*/1', minute='20'),
     },
     'generate-wallets-dashboards': {
@@ -14,3 +14,4 @@ beat_schedule = {
         'schedule': crontab(hour='*/1', minute='30'),
     }
 }
+

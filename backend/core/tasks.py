@@ -10,8 +10,8 @@ def update_wallets():
 
 
 @app.task(max_retries=0)
-def save_last_five_years_prices():
-    prices_service.save_last_five_years_prices()
+def save_coin_price_history_in_database():
+    prices_service.save_coin_price_history_in_database()
 
 
 @app.task(max_retries=0)

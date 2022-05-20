@@ -10,6 +10,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         pass
-        prices_service.save_last_five_years_prices()
+        # prices_service.save_coin_price_history_in_database()
         polygon_service.update_wallets()
         grafana_service.generate_wallets_dashboards()

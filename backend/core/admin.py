@@ -1,7 +1,7 @@
 from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 
-from core.models import User, Wallet, Coin, CoinPrice, WalletCoinBalance, Image
+from core.models import User, Wallet, Coin, CoinPrice, WalletCoinBalance, Image, WalletTotalBalance
 
 
 @admin.register(User)
@@ -47,11 +47,15 @@ class WalletCoinBalanceAdmin(ImportExportModelAdmin):
     )
 
 
+@admin.register(WalletTotalBalance)
+class WalletTotalBalanceAdmin(ImportExportModelAdmin):
+    list_display = (
+        'id', 'wallet', 'usd_balance', 'date',
+    )
+
+
 @admin.register(Image)
 class ImageAdmin(ImportExportModelAdmin):
     list_display = (
         'id', 'name', 'img',
     )
-
-
-

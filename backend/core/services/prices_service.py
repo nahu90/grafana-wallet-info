@@ -20,10 +20,9 @@ class PricesService:
 
         return price[coin_id]['usd']
 
-    def get_price_history(self, coin_id, years):
-        now = datetime.now()
-        to_timestamp = datetime.timestamp(now)
-        from_timestamp = datetime.timestamp(now - relativedelta(years=years))
+    def get_price_history(self, coin_id, date_start):
+        from_timestamp = int(datetime.timestamp(date_start))
+        to_timestamp = int(datetime.timestamp(datetime.now()))
 
         prices_history = self.coingecko_api.get_coin_market_chart_range_by_id(
             coin_id,
@@ -51,18 +50,20 @@ class PricesService:
             coin_price.price = price[1]
             coin_price.save()
 
-    def save_prices_in_database(self, years_to_save):
+    def save_coin_price_history_in_database(self):
         coins = Coin.objects.filter(is_active=True)
 
         for coin in coins:
+            date_start = datetime.now() - relativedelta(years=8)
+            last_coin_price = CoinPrice.objects.filter(coin=coin).order_by('-date').first()
+            if last_coin_price:
+                date_start = datetime.combine(last_coin_price.date, datetime.min.time())
+
             try:
-                price_history = self.get_price_history(coin.coingecko_id, years_to_save)
+                price_history = self.get_price_history(coin.coingecko_id, date_start)
                 self.save_coin_price_history(coin, price_history)
             except Exception as e:
                 print(e)
-
-    def save_last_five_years_prices(self):
-        self.save_prices_in_database(5)
 
 
 prices_service = PricesService()
