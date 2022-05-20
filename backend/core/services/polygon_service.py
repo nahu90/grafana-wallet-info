@@ -114,6 +114,7 @@ class PolygonService:
         self.save_matic_balance(wallet, wallet_total_balance.id)
         self.save_aave_balance(wallet, wallet_total_balance.id)
 
+        wallet_total_balance = WalletTotalBalance.objects.get(pk=wallet_total_balance.id)
         wallet_total_balance.is_active = True
         wallet_total_balance.save()
 
