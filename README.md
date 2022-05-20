@@ -8,7 +8,7 @@
 
   <p align="center">
     <br />
-    <a href="http://naha.ar/">View Demo</a>
+    <a href="http://naha.ar/dashboards">View Demo</a>
     ·
     <a href="https://github.com/nahu90/grafana-wallet-info/issues">Report Bug</a>
     ·
