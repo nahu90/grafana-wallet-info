@@ -31,13 +31,16 @@ class PolygonService:
         )
         wallet_coin_balance.save()
 
-        usd_price = prices_service.get_actual_price(coin.coingecko_id)
-        wallet_coin_balance.usd_balance = usd_price * wallet_coin_balance.balance
-        wallet_coin_balance.save()
+        try:
+            usd_price = prices_service.get_actual_price(coin.coingecko_id)
+            wallet_coin_balance.usd_balance = usd_price * wallet_coin_balance.balance
+            wallet_coin_balance.save()
 
-        wallet_total_balance = WalletTotalBalance.objects.get(pk=wallet_total_balance_id)
-        wallet_total_balance.usd_balance = wallet_total_balance.usd_balance + wallet_coin_balance.usd_balance
-        wallet_total_balance.save()
+            wallet_total_balance = WalletTotalBalance.objects.get(pk=wallet_total_balance_id)
+            wallet_total_balance.usd_balance = wallet_total_balance.usd_balance + wallet_coin_balance.usd_balance
+            wallet_total_balance.save()
+        except Exception as e:
+            print(e)
 
     def save_matic_balance(self, wallet, wallet_total_balance_id):
         token_balance = self.w3.eth.get_balance(Web3.toChecksumAddress(wallet.address))
@@ -77,13 +80,16 @@ class PolygonService:
         )
         wallet_coin_balance.save()
 
-        usd_price = prices_service.get_actual_price(atoken.coingecko_id)
-        wallet_coin_balance.usd_balance = usd_price * wallet_coin_balance.balance
-        wallet_coin_balance.save()
+        try:
+            usd_price = prices_service.get_actual_price(atoken.coingecko_id)
+            wallet_coin_balance.usd_balance = usd_price * wallet_coin_balance.balance
+            wallet_coin_balance.save()
 
-        wallet_total_balance = WalletTotalBalance.objects.get(pk=wallet_total_balance_id)
-        wallet_total_balance.usd_balance = wallet_total_balance.usd_balance + wallet_coin_balance.usd_balance
-        wallet_total_balance.save()
+            wallet_total_balance = WalletTotalBalance.objects.get(pk=wallet_total_balance_id)
+            wallet_total_balance.usd_balance = wallet_total_balance.usd_balance + wallet_coin_balance.usd_balance
+            wallet_total_balance.save()
+        except Exception as e:
+            print(e)
 
     def save_aave_balance(self, wallet, wallet_total_balance_id):
         atokens = Coin.objects.filter(type=COIN_TYPE.ATOKEN, is_active=True)
@@ -99,13 +105,17 @@ class PolygonService:
         wallet_total_balance = WalletTotalBalance(
             wallet=wallet,
             usd_balance=0,
-            date=timezone.now()
+            date=timezone.now(),
+            is_active=False
         )
         wallet_total_balance.save()
 
         self.save_erc20_balance(wallet, wallet_total_balance.id)
         self.save_matic_balance(wallet, wallet_total_balance.id)
         self.save_aave_balance(wallet, wallet_total_balance.id)
+
+        wallet_total_balance.is_active = True
+        wallet_total_balance.save()
 
     def update_wallets(self):
         wallets = Wallet.objects.filter(is_active=True)

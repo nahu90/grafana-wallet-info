@@ -101,6 +101,8 @@ class WalletTotalBalance(TimeStampedModel):
     usd_balance = models.FloatField(blank=True, null=True)
     date = models.DateTimeField()
 
+    is_active = models.BooleanField(default=True)
+
     class Meta:
         verbose_name = _('Wallet Total Balance')
         verbose_name_plural = _('Wallet Total Balances')
