@@ -8,16 +8,11 @@
 
   <p align="center">
     <br />
-    <a href="http://naha.ar/dashboards">View Demo</a>
-    ·
     <a href="https://github.com/nahu90/grafana-wallet-info/issues">Report Bug</a>
     ·
     <a href="https://github.com/nahu90/grafana-wallet-info/issues">Request Feature</a>
   </p>
 </div>
-
-[![grafana Screen Shot][product-screenshot-1]](http://django.naha.ar/media/images/Screenshot_from_2022-05-19_18-43-40.png)
-[![grafana Screen Shot][product-screenshot-2]](http://django.naha.ar/media/images/Screenshot_from_2022-05-15_00-41-53.png)
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
@@ -39,9 +34,6 @@ To achieve this, I've developed a docker compose that contains the following pic
 I've decided to make this project public since I've found out that it is really hard to get 
 information about including a grafana in a docker compose, as well as how to use it with grafanalib 
 in order to create graphics that are related to economic issues. 
-
-
-[![grafana Screen Shot][product-screenshot-3]](http://django.naha.ar/media/images/Screenshot_from_2022-05-15_00-44-06.png)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
